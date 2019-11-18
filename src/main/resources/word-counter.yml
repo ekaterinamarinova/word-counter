@@ -1,0 +1,5 @@
+### Main configuration file
+### Load additional configuration files depending on the active profiles
+camel:
+  springboot:
+    main-run-controller: true
