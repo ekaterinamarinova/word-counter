@@ -14,9 +14,13 @@ public class WordCounterRoute extends RouteBuilder {
     }
 
     public void configure() throws Exception {
-        from("quartz2://simpleCron?cron=" + properties.getCron())
+
+        from("quartz2://simpleCron?cron=" + properties.getCronExpressionWorkdaysEachMinute())
                 .process("downloadProcessor")
                 .split(body())
-                .log("${body}");
+                    .process("wordCountProcessor")
+                    .log("${body}")
+                .end();
+
     }
 }

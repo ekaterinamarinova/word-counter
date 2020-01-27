@@ -1,12 +1,10 @@
 package com.personaltask.wordcounter.processor;
 
 import com.personaltask.wordcounter.exception.NoSuchFileException;
+import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.property.yml.GoogleCloudProperties;
-import com.personaltask.wordcounter.storage.StorageService;
-import org.apache.camel.CamelContext;
+import com.personaltask.wordcounter.service.StorageService;
 import org.apache.camel.Exchange;
-import org.apache.camel.Message;
-import org.apache.camel.model.ModelCamelContext;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,6 +29,9 @@ public class DownloadProcessorTest extends CamelTestSupport {
 
     @Mock
     private GoogleCloudProperties properties;
+
+    @Mock
+    private ApplicationProperties applicationProperties;
 
     private DownloadProcessor downloadProcessor;
 
@@ -57,32 +58,32 @@ public class DownloadProcessorTest extends CamelTestSupport {
     public void testProcess() throws Exception {
         when(properties.getBucket()).thenReturn("");
         when(properties.getExt()).thenReturn("");
-        when(properties.getFileDestination()).thenReturn("");
+        when(applicationProperties.getFileDestination()).thenReturn("");
         when(properties.getFileNamePrefix()).thenReturn("");
-        when(downloadService.downloadFile(anyString(), anyString(), anyString(), anyString()))
+        when(downloadService.downloadFiles(anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(paths);
 
-        downloadProcessor = new DownloadProcessor(downloadService, properties);
+        downloadProcessor = new DownloadProcessor(downloadService, properties, applicationProperties);
 
         downloadProcessor.process(exchange);
 
         Assert.assertEquals(paths, exchange.getIn().getBody());
-        verify(downloadService, times(1)).downloadFile(anyString(), anyString(), anyString(), anyString());
+        verify(downloadService, times(1)).downloadFiles(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test(expected = NoSuchFileException.class)
     public void test_withException() throws Exception {
         when(properties.getBucket()).thenReturn(null);
         when(properties.getExt()).thenReturn("");
-        when(properties.getFileDestination()).thenReturn("");
+        when(applicationProperties.getFileDestination()).thenReturn("");
         when(properties.getFileNamePrefix()).thenReturn("");
-        when(downloadService.downloadFile(eq(null), anyString(), anyString(), anyString()))
+        when(downloadService.downloadFiles(eq(null), anyString(), anyString(), anyString()))
                 .thenThrow(new NoSuchFileException("random message"));
 
-        downloadProcessor = new DownloadProcessor(downloadService, properties);
+        downloadProcessor = new DownloadProcessor(downloadService, properties, applicationProperties);
 
         downloadProcessor.process(exchange);
-        verify(downloadService, times(1)).downloadFile(eq(null), anyString(), anyString(), anyString());
+        verify(downloadService, times(1)).downloadFiles(eq(null), anyString(), anyString(), anyString());
     }
 
 }

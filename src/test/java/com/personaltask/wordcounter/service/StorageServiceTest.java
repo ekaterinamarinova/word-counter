@@ -1,4 +1,4 @@
-package com.personaltask.wordcounter.storage;
+package com.personaltask.wordcounter.service;
 
 import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
@@ -14,6 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.util.ObjectUtils;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,9 @@ public class StorageServiceTest {
     private Page<Blob> page;
 
     @Mock
+    private FileOperations fileOperations;
+
+    @Mock
     private Blob blob;
 
     @InjectMocks
@@ -38,21 +42,32 @@ public class StorageServiceTest {
 
     private Iterable<Blob> iterable;
 
+    private Path testPath;
+
+    private String testFileName;
+
     @Before
     public void setup() {
         iterable = new ArrayList<>();
-
+        testPath = Paths.get("test");
+        testFileName = "StorageServiceTest.txt";
     }
 
     @Test
     public void testDownloadFile() throws Exception {
+        byte[] mockContent = new byte[]{1,0,1,0};
         when(blob.getSize()).thenReturn(Long.valueOf(12345));
         when(blob.getName()).thenReturn("/BlobName.txt");
+        when(blob.getContent()).thenReturn(mockContent);
         ((ArrayList<Blob>) iterable).add(blob);
         when(page.iterateAll()).thenReturn(iterable);
         when(storage.list(anyString(), any())).thenReturn(page);
+        when(fileOperations.createFile(any(), anyString()))
+                .thenReturn(testPath);
+        when(fileOperations.writeToFile(any(), anyString()))
+                .thenReturn(Paths.get(testPath + testFileName));
 
-        List<Path> result = service.downloadFile("bucket", "prefix", "txt", "testTemp");
+        List<Path> result = service.downloadFiles("bucket", "prefix", "txt", "testTemp");
 
         verify(storage, times(1)).list(anyString(), any());
         Assert.assertFalse(ObjectUtils.isEmpty(result));
@@ -60,29 +75,31 @@ public class StorageServiceTest {
 
     @Test(expected = NoSuchFileException.class)
     public void testDownloadFile_withNullBucket() throws Exception {
-        service.downloadFile(null, "prefix", "txt", "testTemp");
+        service.downloadFiles(null, "prefix", "txt", "testTemp");
     }
 
     @Test(expected = Exception.class)
     public void testDownloadFile_withNoSlash() throws Exception {
         when(blob.getSize()).thenReturn(Long.valueOf(12345));
-        when(blob.getName()).thenReturn("BlobName.txt");
+        when(blob.getName()).thenReturn("/BlobName.txt");
         ((ArrayList<Blob>) iterable).add(blob);
         when(page.iterateAll()).thenReturn(iterable);
         when(storage.list(anyString(), any())).thenReturn(page);
 
-        service.downloadFile("bucket", "prefix", "txt", "testTemp");
+        service.downloadFiles("bucket", "prefix", "txt", "testTemp");
 
     }
 
-    @Test(expected = NoSuchFileException.class)
+    @Test
     public void testDownloadFile_withEmptyFile() throws Exception {
         when(blob.getSize()).thenReturn(Long.valueOf(0));
         ((ArrayList<Blob>) iterable).add(blob);
         when(page.iterateAll()).thenReturn(iterable);
         when(storage.list(anyString(), any())).thenReturn(page);
 
-        service.downloadFile("bucket", "prefix", "txt", "testTemp");
+        List<Path> result = service.downloadFiles("bucket", "prefix", "txt", "testTemp");
+
+        Assert.assertTrue(ObjectUtils.isEmpty(result));
     }
 
 }

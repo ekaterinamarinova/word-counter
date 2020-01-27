@@ -1,0 +1,109 @@
+package com.personaltask.wordcounter.service;
+
+import com.google.api.gax.paging.Page;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.personaltask.wordcounter.constant.Constants;
+import com.personaltask.wordcounter.exception.ElementNotFoundException;
+import com.personaltask.wordcounter.exception.NoSuchFileException;
+import lombok.val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class StorageService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StorageService.class);
+
+    private Storage storage;
+    private FileOperations fileOperations;
+
+    public StorageService(Storage storage, FileOperations fileOperations) {
+        this.storage = storage;
+        this.fileOperations = fileOperations;
+    }
+
+    /**
+     * Downloads files from google cloud storage by prefix,
+     * moves successfully downloaded ones to outbound.
+     *
+     * @param bucket         - bucket to download/upload to
+     * @param fileNamePrefix - the prefix used to list the file
+     * @param ext            - the file extension
+     * @param destination    - the local folder that's created to store the downloaded file
+     * @return - {@link List<Path>} containing all the blob paths on the local system
+     * @throws NoSuchFileException      - if something with the blob/bucket is/goes wrong
+     * @throws IOException              - when something goes wrong with creating a directory for local storage
+     * @throws ElementNotFoundException - when slash is not found
+     */
+    public List<Path> downloadFiles(String bucket, String fileNamePrefix,
+                                    String ext, String destination) throws NoSuchFileException, IOException, ElementNotFoundException {
+
+        if (bucket == null) {
+            throw new NoSuchFileException("Bucket name is null. Check configuration file.");
+        }
+
+        LOGGER.debug("Fetching file " + fileNamePrefix + " from bucket: {}", bucket);
+        Page<Blob> blobs = storage.list(
+                bucket,
+                Storage.BlobListOption.prefix(fileNamePrefix)
+        );
+
+        List<Path> blobPathList = new ArrayList<>();
+
+        for (Blob blob : blobs.iterateAll()) {
+            if (blob.getSize() > 0 && blob.getName().endsWith(ext)) {
+                int indexOfSlash = blob.getName().lastIndexOf(Constants.SLASH);
+
+                if (indexOfSlash == -1) {
+                    throw new ElementNotFoundException("No occurrence of " + Constants.SLASH + " in blob name");
+                }
+
+                val blobNameExtension = blob.getName().substring(indexOfSlash);
+                val directoryPath = FileSystems.getDefault().getPath(destination + Constants.SLASH);
+                val pathToEmptyFile = fileOperations.createFile(
+                        directoryPath,
+                        blobNameExtension
+                );
+                val pathToBlob = fileOperations.writeToFile(pathToEmptyFile, new String(blob.getContent()));
+
+                //if no exception occurs, add current blob path to the list to be used on downstream processing
+                blobPathList.add(pathToBlob);
+            }
+        }
+
+        return blobPathList;
+    }
+
+    public void moveBlob(Blob blob, String bucket, String targetBlob) throws NoSuchFileException {
+        blob.copyTo(bucket, targetBlob);
+        boolean deleted = blob.delete();
+
+        if (!deleted) {
+            throw new NoSuchFileException("Deleting blob with name <" +
+                    targetBlob + "> failed because blob was not found.");
+        }
+    }
+
+    public void uploadFile(String bucket, String blobFullName, byte[] content) {
+        LOGGER.debug("Uploading file to bucket " + bucket + ", with blob destination " + blobFullName);
+
+        BlobId blobId = BlobId.of(bucket, blobFullName);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                .setContentType(Constants.CONTENT_TYPE)
+                .build();
+        storage.create(blobInfo, content);
+
+        LOGGER.debug("Blob " + blobFullName + " uploaded to bucket " + bucket);
+    }
+
+}

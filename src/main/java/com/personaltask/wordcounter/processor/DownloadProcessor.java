@@ -1,7 +1,8 @@
 package com.personaltask.wordcounter.processor;
 
+import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.property.yml.GoogleCloudProperties;
-import com.personaltask.wordcounter.storage.StorageService;
+import com.personaltask.wordcounter.service.StorageService;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.List;
+
+import static com.personaltask.wordcounter.constant.Constants.SLASH;
 
 
 /**
@@ -23,22 +26,24 @@ public class DownloadProcessor implements Processor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadProcessor.class);
 
     private StorageService storageService;
-    private GoogleCloudProperties properties;
+    private GoogleCloudProperties googleCloudProperties;
+    private ApplicationProperties applicationProperties;
 
-    public DownloadProcessor(StorageService storageService, GoogleCloudProperties properties) {
+    public DownloadProcessor(StorageService storageService, GoogleCloudProperties googleCloudProperties, ApplicationProperties applicationProperties) {
         this.storageService = storageService;
-        this.properties = properties;
+        this.googleCloudProperties = googleCloudProperties;
+        this.applicationProperties = applicationProperties;
     }
 
     public void process(Exchange exchange) throws Exception {
         LOGGER.debug("Attempting download...");
-        List<Path> content = storageService.downloadFile(
-                properties.getBucket(),
-                properties.getInbound() + properties.getFileNamePrefix(),
-                properties.getExt(),
-                properties.getFileDestination()
+        List<Path> pathList = storageService.downloadFiles(
+                googleCloudProperties.getBucket(),
+                googleCloudProperties.getInbound() + googleCloudProperties.getFileNamePrefix(),
+                googleCloudProperties.getExt(),
+                SLASH + applicationProperties.getFileDestination() + applicationProperties.getDownloaded()
         );
         LOGGER.debug("File successfully downloaded.");
-        exchange.getIn().setBody(content);
+        exchange.getIn().setBody(pathList);
     }
 }
