@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * After that it "reads" every word in the current file,
  * and if all processing has been successful -> uploads the
  * result file in a success folder.
- *
+ * <p>
  * If any issues are encountered during file reading or processing ->
  * "broken" file is uploaded to an error folder.
  *

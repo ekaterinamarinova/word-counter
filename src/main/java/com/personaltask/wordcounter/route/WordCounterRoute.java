@@ -4,6 +4,11 @@ import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;
 
+/**
+ * Component, holding the route to be executed
+ *
+ * @author EMarinova
+ */
 @Component
 public class WordCounterRoute extends RouteBuilder {
 
@@ -19,8 +24,10 @@ public class WordCounterRoute extends RouteBuilder {
                 .process("downloadProcessor")
                 .split(body())
                     .process("wordCountProcessor")
-                    .log("${body}")
-                .end();
+                    .process("uploadProcessor")
+                    .process("moveProcessor")
+                .end()
+                .process("cleanLocalDirProcessor");
 
     }
 }

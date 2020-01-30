@@ -1,5 +1,6 @@
 package com.personaltask.wordcounter.processor;
 
+import com.personaltask.wordcounter.constant.Constants;
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.property.yml.GoogleCloudProperties;
 import com.personaltask.wordcounter.service.StorageService;
@@ -12,11 +13,9 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.util.List;
 
-import static com.personaltask.wordcounter.constant.Constants.SLASH;
-
 
 /**
- * Processor used for downloading files from Google Cloud
+ * Processor used for downloading files from Google Cloud.
  *
  * @author EMarinova
  */
@@ -41,7 +40,7 @@ public class DownloadProcessor implements Processor {
                 googleCloudProperties.getBucket(),
                 googleCloudProperties.getInbound() + googleCloudProperties.getFileNamePrefix(),
                 googleCloudProperties.getExt(),
-                SLASH + applicationProperties.getFileDestination() + applicationProperties.getDownloaded()
+                applicationProperties.getFileDestinationLocal() + applicationProperties.getDownloaded()
         );
         LOGGER.debug("File successfully downloaded.");
         exchange.getIn().setBody(pathList);

@@ -5,6 +5,11 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Holds the properties specific for the Google Cloud Storage configuration.
+ *
+ * @author EMarinova
+ */
 @Configuration
 @ConfigurationProperties(prefix = "google-storage")
 @Getter

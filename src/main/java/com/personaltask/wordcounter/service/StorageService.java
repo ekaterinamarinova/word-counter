@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class StorageService {
                 }
 
                 val blobNameExtension = blob.getName().substring(indexOfSlash);
-                val directoryPath = FileSystems.getDefault().getPath(destination + Constants.SLASH);
+                val directoryPath = Paths.get(destination).toAbsolutePath().normalize();
                 val pathToEmptyFile = fileOperations.createFile(
                         directoryPath,
                         blobNameExtension
@@ -84,26 +85,50 @@ public class StorageService {
         return blobPathList;
     }
 
-    public void moveBlob(Blob blob, String bucket, String targetBlob) throws NoSuchFileException {
-        blob.copyTo(bucket, targetBlob);
+    /**
+     * Moves a {@link Blob} to a specific bucket and destination in that bucket.
+     *
+     * @param bucket     - target bucket name
+     * @param newBlobDest - destination in bucket + (new) blob name + (new) blob extension
+     * @throws NoSuchFileException - if blob to be moved was not found
+     */
+    public void moveBlob(String bucket, String oldBlobDest, String newBlobDest) throws NoSuchFileException {
+        BlobId blobId = BlobId.of(bucket, oldBlobDest);
+
+        Blob blob = storage.get(blobId);
+
+        if (blob == null) {
+            throw new NoSuchFileException("Blob with destination " + oldBlobDest + " could not be fetched.");
+        }
+
+        blob.copyTo(bucket, newBlobDest);
         boolean deleted = blob.delete();
 
         if (!deleted) {
             throw new NoSuchFileException("Deleting blob with name <" +
-                    targetBlob + "> failed because blob was not found.");
+                    newBlobDest + "> failed because blob was not found.");
         }
     }
 
-    public void uploadFile(String bucket, String blobFullName, byte[] content) {
+    /**
+     * Uploads a {@link Blob} to a destination bucket.
+     *
+     * @param bucket       - bucket name
+     * @param blobFullName - path to blob (directories) + name + extension
+     * @param content      - content to be written to blob
+     */
+    public Blob uploadFile(String bucket, String blobFullName, byte[] content) {
         LOGGER.debug("Uploading file to bucket " + bucket + ", with blob destination " + blobFullName);
 
         BlobId blobId = BlobId.of(bucket, blobFullName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType(Constants.CONTENT_TYPE)
                 .build();
-        storage.create(blobInfo, content);
+        Blob uploadedBlob = storage.create(blobInfo, content);
 
         LOGGER.debug("Blob " + blobFullName + " uploaded to bucket " + bucket);
+
+        return uploadedBlob;
     }
 
 }

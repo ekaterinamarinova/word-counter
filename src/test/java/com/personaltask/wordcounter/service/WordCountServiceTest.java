@@ -12,7 +12,7 @@ public class WordCountServiceTest {
 
     @Test
     public void testCountWords() {
-        String mockContent = "mock .message,! ?\n\r";
+        String mockContent = "mock ---.message,! ?\n\r";
         Map<String, Integer> expected = new TreeMap<>();
         expected.put("message", 1);
         expected.put("mock", 1);

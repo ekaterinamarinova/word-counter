@@ -59,7 +59,7 @@ public class WordCountProcessorTest extends CamelTestSupport {
         exchange = createExchangeWithBody(dir);
 
         //mock properties
-        when(properties.getFileDestination()).thenReturn("");
+        when(properties.getFileDestinationLocal()).thenReturn("");
         when(properties.getCounted()).thenReturn("");
 
         //mock file operations

@@ -2,7 +2,10 @@ package com.personaltask.wordcounter.service;
 
 import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
+import com.personaltask.wordcounter.constant.Constants;
 import com.personaltask.wordcounter.exception.NoSuchFileException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -100,6 +103,47 @@ public class StorageServiceTest {
         List<Path> result = service.downloadFiles("bucket", "prefix", "txt", "testTemp");
 
         Assert.assertTrue(ObjectUtils.isEmpty(result));
+    }
+
+    @Test
+    public void testMoveBlob() throws NoSuchFileException {
+        BlobId blobId = BlobId.of("test", "test");
+        when(storage.get(blobId)).thenReturn(blob);
+        when(blob.copyTo("test", "test")).thenReturn(null);
+        when(blob.delete()).thenReturn(true);
+
+        service.moveBlob("test", "test", "test");
+
+        verify(storage, times(1)).get(blobId);
+        verify(blob, times(1)).delete();
+    }
+
+    @Test(expected = NoSuchFileException.class)
+    public void testMoveBlob_withBlobNotDeleted() throws NoSuchFileException {
+        BlobId blobId = BlobId.of("test", "test");
+        when(storage.get(blobId)).thenReturn(blob);
+        when(blob.copyTo("test", "test")).thenReturn(null);
+        when(blob.delete()).thenReturn(false);
+
+        service.moveBlob("test", "test", "test");
+
+        verify(storage, times(1)).get(blobId);
+        verify(blob, times(1)).delete();
+    }
+
+    @Test
+    public void testUploadFile() {
+        BlobId blobId = BlobId.of("test", "test");
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                .setContentType(Constants.CONTENT_TYPE)
+                .build();
+
+        when(storage.create(blobInfo, "content".getBytes())).thenReturn(blob);
+
+        Blob result = service.uploadFile("test", "test", "content".getBytes());
+
+        Assert.assertEquals(blob, result);
+        verify(storage, times(1)).create(blobInfo, "content".getBytes());
     }
 
 }

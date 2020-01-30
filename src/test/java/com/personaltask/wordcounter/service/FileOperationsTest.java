@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +33,7 @@ public class FileOperationsTest {
     @Test
     public void testWriteToFile() throws IOException {
         Path dir = Files.createDirectory(Paths.get(DIRECTORY));
-        Path pathToFile = Files.createFile(Paths.get(FILE_NAME.substring(1)));
+        Path pathToFile = Files.createFile(Paths.get(dir.toString() + FileSystems.getDefault().getSeparator() + FILE_NAME.substring(1)));
         String content = "content 123";
 
         Path result = fileOperations.writeToFile(pathToFile, content);
@@ -50,7 +51,7 @@ public class FileOperationsTest {
     @Test
     public void testReadFromFile() throws IOException {
         Path dir = Files.createDirectory(Paths.get(DIRECTORY));
-        Path pathToFile = Files.createFile(Paths.get(FILE_NAME.substring(1)));
+        Path pathToFile = Files.createFile(Paths.get(dir.toString() + FileSystems.getDefault().getSeparator() + FILE_NAME.substring(1)));
         String content = "content 123";
         Files.write(pathToFile, content.getBytes());
 
@@ -65,12 +66,24 @@ public class FileOperationsTest {
     @Test
     public void testDeleteFile() throws IOException {
         Path dir = Files.createDirectory(Paths.get(DIRECTORY));
-        Path pathToFile = Files.createFile(Paths.get(FILE_NAME.substring(1)));
+        Path pathToFile = Files.createFile(Paths.get(dir.toString() + FileSystems.getDefault().getSeparator() + FILE_NAME.substring(1)));
 
         boolean isFileDeleted = fileOperations.deleteFile(pathToFile);
         boolean isDirDeleted = fileOperations.deleteFile(dir);
 
         Assert.assertTrue(isFileDeleted);
+        Assert.assertTrue(isDirDeleted);
+        Assert.assertFalse(Files.exists(pathToFile));
+        Assert.assertFalse(Files.exists(dir));
+    }
+
+    @Test
+    public void testDeleteDirWithContent() throws IOException {
+        Path dir = Files.createDirectory(Paths.get(DIRECTORY));
+        Path pathToFile = Files.createFile(Paths.get(dir.toString() + FileSystems.getDefault().getSeparator() + FILE_NAME.substring(1)));
+
+        boolean isDirDeleted = fileOperations.deleteDirWithContent(dir);
+
         Assert.assertTrue(isDirDeleted);
         Assert.assertFalse(Files.exists(pathToFile));
         Assert.assertFalse(Files.exists(dir));

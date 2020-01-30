@@ -3,7 +3,6 @@ package com.personaltask.wordcounter.service;
 import com.personaltask.wordcounter.constant.Constants;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
 @Service
@@ -15,14 +14,14 @@ public class WordCountService {
      * occurred in the current string.
      *
      * @param message - working string
-     * @return - a {@link LinkedHashMap} containing the word itself as a {@link String} key
+     * @return - a {@link TreeMap} containing the word itself as a {@link String} key
      * and how many times it has been repeated as an {@link Integer} value
      */
     public TreeMap<String, Integer> countWords(String message) {
         TreeMap<String, Integer> differentWords = new TreeMap<>();
 
         String[] words = message.toLowerCase()
-                .replaceAll("[,.!?\"\n\r]", Constants.WHITE_SPACE)
+                .replaceAll("[,.\\-!?\"\n\r]", Constants.WHITE_SPACE)
                 .split("\\s+");
 
         for (String word : words) {

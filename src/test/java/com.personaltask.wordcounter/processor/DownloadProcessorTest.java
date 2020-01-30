@@ -58,7 +58,7 @@ public class DownloadProcessorTest extends CamelTestSupport {
     public void testProcess() throws Exception {
         when(properties.getBucket()).thenReturn("");
         when(properties.getExt()).thenReturn("");
-        when(applicationProperties.getFileDestination()).thenReturn("");
+        when(applicationProperties.getFileDestinationLocal()).thenReturn("");
         when(properties.getFileNamePrefix()).thenReturn("");
         when(downloadService.downloadFiles(anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(paths);
@@ -75,7 +75,7 @@ public class DownloadProcessorTest extends CamelTestSupport {
     public void test_withException() throws Exception {
         when(properties.getBucket()).thenReturn(null);
         when(properties.getExt()).thenReturn("");
-        when(applicationProperties.getFileDestination()).thenReturn("");
+        when(applicationProperties.getFileDestinationLocal()).thenReturn("");
         when(properties.getFileNamePrefix()).thenReturn("");
         when(downloadService.downloadFiles(eq(null), anyString(), anyString(), anyString()))
                 .thenThrow(new NoSuchFileException("random message"));

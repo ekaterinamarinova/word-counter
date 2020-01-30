@@ -10,8 +10,8 @@ server:
 
 application:
   cron-expression-workdays-each-minute: 0+0/1+10-23+?+*+MON-FRI
-  file-destination: word-counter-tmp
-  generated-file-name-prefix: Counted
+  file-destination-local: /word-counter-tmp/
+  generated-file-name-prefix: Counted-
   downloaded: downloaded/
   counted: counted/
 
