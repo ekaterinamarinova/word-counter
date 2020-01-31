@@ -6,15 +6,15 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.personaltask.wordcounter.constant.Constants;
+import com.personaltask.wordcounter.exception.BlobNotFoundException;
 import com.personaltask.wordcounter.exception.ElementNotFoundException;
-import com.personaltask.wordcounter.exception.NoSuchFileException;
+import com.personaltask.wordcounter.exception.NoSuchBucketException;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -42,15 +42,15 @@ public class StorageService {
      * @param ext            - the file extension
      * @param destination    - the local folder that's created to store the downloaded file
      * @return - {@link List<Path>} containing all the blob paths on the local system
-     * @throws NoSuchFileException      - if something with the blob/bucket is/goes wrong
+     * @throws NoSuchBucketException      - if something with the blob/bucket is/goes wrong
      * @throws IOException              - when something goes wrong with creating a directory for local storage
      * @throws ElementNotFoundException - when slash is not found
      */
     public List<Path> downloadFiles(String bucket, String fileNamePrefix,
-                                    String ext, String destination) throws NoSuchFileException, IOException, ElementNotFoundException {
+                                    String ext, String destination) throws IOException, ElementNotFoundException, NoSuchBucketException {
 
-        if (bucket == null) {
-            throw new NoSuchFileException("Bucket name is null. Check configuration file.");
+        if (bucket == null || Constants.EMPTY_STRING.equals(bucket)) {
+            throw new NoSuchBucketException("Bucket name is null. Check configuration file.");
         }
 
         LOGGER.debug("Fetching file " + fileNamePrefix + " from bucket: {}", bucket);
@@ -88,24 +88,24 @@ public class StorageService {
     /**
      * Moves a {@link Blob} to a specific bucket and destination in that bucket.
      *
-     * @param bucket     - target bucket name
+     * @param oldBucket     - target bucket name
      * @param newBlobDest - destination in bucket + (new) blob name + (new) blob extension
-     * @throws NoSuchFileException - if blob to be moved was not found
+     * @throws BlobNotFoundException - if blob to be moved was not found
      */
-    public void moveBlob(String bucket, String oldBlobDest, String newBlobDest) throws NoSuchFileException {
-        BlobId blobId = BlobId.of(bucket, oldBlobDest);
+    public void moveBlob(String oldBucket ,String oldBlobDest, String newBucket, String newBlobDest) throws BlobNotFoundException {
+        BlobId blobId = BlobId.of(oldBucket, oldBlobDest);
 
         Blob blob = storage.get(blobId);
 
         if (blob == null) {
-            throw new NoSuchFileException("Blob with destination " + oldBlobDest + " could not be fetched.");
+            throw new BlobNotFoundException("Blob with destination " + oldBlobDest + " could not be fetched.");
         }
 
-        blob.copyTo(bucket, newBlobDest);
+        blob.copyTo(newBucket, newBlobDest);
         boolean deleted = blob.delete();
 
         if (!deleted) {
-            throw new NoSuchFileException("Deleting blob with name <" +
+            throw new BlobNotFoundException("Deleting blob with name <" +
                     newBlobDest + "> failed because blob was not found.");
         }
     }

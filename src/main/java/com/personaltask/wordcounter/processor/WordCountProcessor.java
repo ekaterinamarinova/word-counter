@@ -24,6 +24,7 @@ import java.util.Map;
 @Component
 public class WordCountProcessor implements Processor {
     private static final Logger LOGGER = LoggerFactory.getLogger(WordCountProcessor.class);
+    public static final String NAME = "wordCountProcessor";
 
     private WordCountService service;
     private ApplicationProperties properties;

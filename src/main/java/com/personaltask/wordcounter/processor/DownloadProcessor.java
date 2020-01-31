@@ -1,6 +1,5 @@
 package com.personaltask.wordcounter.processor;
 
-import com.personaltask.wordcounter.constant.Constants;
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.property.yml.GoogleCloudProperties;
 import com.personaltask.wordcounter.service.StorageService;
@@ -23,6 +22,7 @@ import java.util.List;
 public class DownloadProcessor implements Processor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadProcessor.class);
+    public static final String NAME = "downloadProcessor";
 
     private StorageService storageService;
     private GoogleCloudProperties googleCloudProperties;

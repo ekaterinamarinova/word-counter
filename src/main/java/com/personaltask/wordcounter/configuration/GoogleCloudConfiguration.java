@@ -1,9 +1,9 @@
 package com.personaltask.wordcounter.configuration;
 
+import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.google.cloud.storage.Storage;
 
 @Configuration
 public class GoogleCloudConfiguration {

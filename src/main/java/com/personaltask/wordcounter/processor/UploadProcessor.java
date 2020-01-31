@@ -22,6 +22,7 @@ import java.nio.file.Path;
 public class UploadProcessor implements Processor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UploadProcessor.class);
+    public static final String NAME = "uploadProcessor";
 
     private StorageService storageService;
     private GoogleCloudProperties properties;

@@ -6,7 +6,8 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.personaltask.wordcounter.constant.Constants;
-import com.personaltask.wordcounter.exception.NoSuchFileException;
+import com.personaltask.wordcounter.exception.BlobNotFoundException;
+import com.personaltask.wordcounter.exception.NoSuchBucketException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,7 +77,7 @@ public class StorageServiceTest {
         Assert.assertFalse(ObjectUtils.isEmpty(result));
     }
 
-    @Test(expected = NoSuchFileException.class)
+    @Test(expected = NoSuchBucketException.class)
     public void testDownloadFile_withNullBucket() throws Exception {
         service.downloadFiles(null, "prefix", "txt", "testTemp");
     }
@@ -106,26 +107,26 @@ public class StorageServiceTest {
     }
 
     @Test
-    public void testMoveBlob() throws NoSuchFileException {
+    public void testMoveBlob() throws BlobNotFoundException {
         BlobId blobId = BlobId.of("test", "test");
         when(storage.get(blobId)).thenReturn(blob);
         when(blob.copyTo("test", "test")).thenReturn(null);
         when(blob.delete()).thenReturn(true);
 
-        service.moveBlob("test", "test", "test");
+        service.moveBlob("test", "test", "test", "test");
 
         verify(storage, times(1)).get(blobId);
         verify(blob, times(1)).delete();
     }
 
-    @Test(expected = NoSuchFileException.class)
-    public void testMoveBlob_withBlobNotDeleted() throws NoSuchFileException {
+    @Test(expected = BlobNotFoundException.class)
+    public void testMoveBlob_withBlobNotDeleted() throws BlobNotFoundException {
         BlobId blobId = BlobId.of("test", "test");
         when(storage.get(blobId)).thenReturn(blob);
         when(blob.copyTo("test", "test")).thenReturn(null);
         when(blob.delete()).thenReturn(false);
 
-        service.moveBlob("test", "test", "test");
+        service.moveBlob("test", "test", "test", "test");
 
         verify(storage, times(1)).get(blobId);
         verify(blob, times(1)).delete();
