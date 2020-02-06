@@ -7,7 +7,7 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.personaltask.wordcounter.constant.Constants;
 import com.personaltask.wordcounter.exception.BlobNotFoundException;
-import com.personaltask.wordcounter.exception.ElementNotFoundException;
+import com.personaltask.wordcounter.exception.InvalidBlobDestinationException;
 import com.personaltask.wordcounter.exception.NoSuchBucketException;
 import lombok.val;
 import org.slf4j.Logger;
@@ -42,12 +42,15 @@ public class StorageService {
      * @param ext            - the file extension
      * @param destination    - the local folder that's created to store the downloaded file
      * @return - {@link List<Path>} containing all the blob paths on the local system
-     * @throws NoSuchBucketException      - if something with the blob/bucket is/goes wrong
+     * @throws NoSuchBucketException    - if something with the blob/bucket is/goes wrong
      * @throws IOException              - when something goes wrong with creating a directory for local storage
-     * @throws ElementNotFoundException - when slash is not found
+     * @throws InvalidBlobDestinationException - when slash is not found
      */
-    public List<Path> downloadFiles(String bucket, String fileNamePrefix,
-                                    String ext, String destination) throws IOException, ElementNotFoundException, NoSuchBucketException {
+    public List<Path> downloadFiles(String bucket,
+                                    String fileNamePrefix,
+                                    String ext,
+                                    String destination)
+            throws IOException, InvalidBlobDestinationException, NoSuchBucketException {
 
         if (bucket == null || Constants.EMPTY_STRING.equals(bucket)) {
             throw new NoSuchBucketException("Bucket name is null. Check configuration file.");
@@ -66,7 +69,7 @@ public class StorageService {
                 int indexOfSlash = blob.getName().lastIndexOf(Constants.SLASH);
 
                 if (indexOfSlash == -1) {
-                    throw new ElementNotFoundException("No occurrence of " + Constants.SLASH + " in blob name");
+                    throw new InvalidBlobDestinationException("No occurrence of " + Constants.SLASH + " in blob name");
                 }
 
                 val blobNameExtension = blob.getName().substring(indexOfSlash);
@@ -88,11 +91,11 @@ public class StorageService {
     /**
      * Moves a {@link Blob} to a specific bucket and destination in that bucket.
      *
-     * @param oldBucket     - target bucket name
+     * @param oldBucket   - target bucket name
      * @param newBlobDest - destination in bucket + (new) blob name + (new) blob extension
      * @throws BlobNotFoundException - if blob to be moved was not found
      */
-    public void moveBlob(String oldBucket ,String oldBlobDest, String newBucket, String newBlobDest) throws BlobNotFoundException {
+    public void moveBlob(String oldBucket, String oldBlobDest, String newBucket, String newBlobDest) throws BlobNotFoundException {
         BlobId blobId = BlobId.of(oldBucket, oldBlobDest);
 
         Blob blob = storage.get(blobId);

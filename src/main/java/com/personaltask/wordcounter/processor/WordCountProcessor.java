@@ -54,7 +54,7 @@ public class WordCountProcessor implements Processor {
         val pathToFileWithContent = fileOperations.writeToFile(pathToEmptyFile, result.toString());
 
         exchange.getIn().setBody(pathToFileWithContent);
-        exchange.setProperty(Constants.BLOB_NAME_KEY, downloadedBlobName);
+        exchange.setProperty(Constants.BLOB_NAME, downloadedBlobName);
 
         LOGGER.debug("Processing of file " + pathToFileForProcessing + " resulted in generating file with path: " + pathToFileWithContent);
     }

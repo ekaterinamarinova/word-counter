@@ -32,9 +32,9 @@ public class MoveProcessorTest extends CamelTestSupport {
         super.setUp();
 
         exchange = createExchangeWithBody("mock body");
-        exchange.setProperty(Constants.BLOB_DEST_KEY, "mockValue");
-        exchange.setProperty(Constants.BLOB_NAME_KEY, "mockValue");
-        exchange.setProperty(Constants.BUCKET_KEY, "mockValue");
+        exchange.setProperty(Constants.BLOB_DESTINATION, "mockValue");
+        exchange.setProperty(Constants.BLOB_NAME, "mockValue");
+        exchange.setProperty(Constants.BUCKET, "mockValue");
     }
 
     @Test
