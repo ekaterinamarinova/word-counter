@@ -1,7 +1,5 @@
 package com.personaltask.wordcounter.processor;
 
-import com.personaltask.wordcounter.exception.BlobNotFoundException;
-import com.personaltask.wordcounter.exception.NoSuchBucketException;
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.property.yml.GoogleCloudProperties;
 import com.personaltask.wordcounter.service.StorageService;
@@ -11,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 

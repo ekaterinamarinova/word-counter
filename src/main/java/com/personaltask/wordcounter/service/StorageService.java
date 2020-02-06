@@ -1,18 +1,17 @@
 package com.personaltask.wordcounter.service;
 
 import com.google.api.gax.paging.Page;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.*;
 import com.personaltask.wordcounter.constant.Constants;
 import com.personaltask.wordcounter.exception.BlobNotFoundException;
 import com.personaltask.wordcounter.exception.InvalidBlobDestinationException;
 import com.personaltask.wordcounter.exception.NoSuchBucketException;
+import com.personaltask.wordcounter.exception.UnsuccessfulBlobDeletionException;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -52,7 +51,7 @@ public class StorageService {
                                     String destination)
             throws IOException, InvalidBlobDestinationException, NoSuchBucketException {
 
-        if (bucket == null || Constants.EMPTY_STRING.equals(bucket)) {
+        if (ObjectUtils.isEmpty(bucket)) {
             throw new NoSuchBucketException("Bucket name is null. Check configuration file.");
         }
 
@@ -95,7 +94,7 @@ public class StorageService {
      * @param newBlobDest - destination in bucket + (new) blob name + (new) blob extension
      * @throws BlobNotFoundException - if blob to be moved was not found
      */
-    public void moveBlob(String oldBucket, String oldBlobDest, String newBucket, String newBlobDest) throws BlobNotFoundException {
+    public void moveBlob(String oldBucket, String oldBlobDest, String newBucket, String newBlobDest) throws BlobNotFoundException, UnsuccessfulBlobDeletionException {
         BlobId blobId = BlobId.of(oldBucket, oldBlobDest);
 
         Blob blob = storage.get(blobId);
@@ -105,11 +104,13 @@ public class StorageService {
         }
 
         blob.copyTo(newBucket, newBlobDest);
-        boolean deleted = blob.delete();
-
-        if (!deleted) {
-            throw new BlobNotFoundException("Deleting blob with name <" +
-                    newBlobDest + "> failed because blob was not found.");
+        try {
+            boolean deleted = blob.delete();
+            if (!deleted) {
+                LOGGER.error("Deleting of blob " + blob.getName() + " was not successful.");
+            }
+        } catch (StorageException e) {
+            throw new UnsuccessfulBlobDeletionException("Failed to delete blob " + blob.getName());
         }
     }
 

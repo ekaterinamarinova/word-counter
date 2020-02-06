@@ -8,6 +8,8 @@ import java.util.TreeMap;
 @Service
 public class WordCountService {
 
+    //put const here
+
     /**
      * A method that counts the words in a given message string.
      * The algorithm saves each word and how many times it has

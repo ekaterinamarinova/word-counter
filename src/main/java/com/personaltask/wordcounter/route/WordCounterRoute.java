@@ -1,9 +1,9 @@
 package com.personaltask.wordcounter.route;
 
-import com.personaltask.wordcounter.constant.Constants;
 import com.personaltask.wordcounter.exception.BlobNotFoundException;
 import com.personaltask.wordcounter.exception.InvalidBlobDestinationException;
 import com.personaltask.wordcounter.exception.NoSuchBucketException;
+import com.personaltask.wordcounter.exception.UnsuccessfulBlobDeletionException;
 import com.personaltask.wordcounter.processor.*;
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.property.yml.GoogleCloudProperties;
@@ -36,28 +36,26 @@ public class WordCounterRoute extends RouteBuilder {
     public void configure() throws Exception {
 
         onException(NoSuchBucketException.class)
-                .log(LoggingLevel.ERROR, LOGGER, "Bucket name is null or empty.")
-                .stop();
+                .log(LoggingLevel.ERROR, LOGGER, "Bucket name is null or empty.");
 
         onException(BlobNotFoundException.class)
-                .log(LoggingLevel.ERROR, LOGGER,"Couldn't move blob because it was not found")
-                .process(CleanLocalDirProcessor.NAME)
-                .stop();
+                .handled(true)
+                .process(ExceptionLoggingProcessor.NAME);
 
         onException(InvalidBlobDestinationException.class)
-                .log(LoggingLevel.ERROR, LOGGER,"Invalid Blob Destination")
-                .process(CleanLocalDirProcessor.NAME)
-                .stop();
+                .handled(true)
+                .process(ExceptionLoggingProcessor.NAME);
+
+        onException(UnsuccessfulBlobDeletionException.class)
+                .handled(true)
+                .maximumRedeliveries(5)
+                .process(ExceptionLoggingProcessor.NAME);
 
         onException(IOException.class)
                 .handled(true)
-                .log(LoggingLevel.ERROR, LOGGER, "I/O exception")
-                .setProperty(
-                        Constants.BLOB_DESTINATION,
-                        constant(googleCloudProperties.getError() + exchangeProperty(Constants.BLOB_NAME).toString())
-                )
-                .process(MoveProcessor.NAME)
-                .process(CleanLocalDirProcessor.NAME);
+                .process(ExceptionLoggingProcessor.NAME);
+
+        onCompletion().process(CleanLocalDirProcessor.NAME);
 
         from("quartz2://simpleCron?cron=" + applicationProperties.getCronExpressionWorkdaysEachMinute())
                 .process(DownloadProcessor.NAME)
@@ -65,8 +63,7 @@ public class WordCounterRoute extends RouteBuilder {
                     .process(WordCountProcessor.NAME)
                     .process(UploadProcessor.NAME)
                     .process(MoveProcessor.NAME)
-                .end()
-                .process(CleanLocalDirProcessor.NAME);
+                .end();
 
     }
 }
