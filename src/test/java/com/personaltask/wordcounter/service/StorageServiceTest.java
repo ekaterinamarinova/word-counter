@@ -6,8 +6,8 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.personaltask.wordcounter.constant.Constants;
-import com.personaltask.wordcounter.exception.BlobNotFoundException;
-import com.personaltask.wordcounter.exception.NoSuchBucketException;
+import com.personaltask.wordcounter.exception.*;
+import lombok.val;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -107,7 +107,7 @@ public class StorageServiceTest {
     }
 
     @Test
-    public void testMoveBlob() throws BlobNotFoundException {
+    public void testMoveBlob() throws BlobNotFoundException, UnsuccessfulBlobMovingException, UnsuccessfulBlobFetchingException, UnsuccessfulBlobDeletionException {
         BlobId blobId = BlobId.of("test", "test");
         when(storage.get(blobId)).thenReturn(blob);
         when(blob.copyTo("test", "test")).thenReturn(null);
@@ -119,8 +119,9 @@ public class StorageServiceTest {
         verify(blob, times(1)).delete();
     }
 
-    @Test(expected = BlobNotFoundException.class)
-    public void testMoveBlob_withBlobNotDeleted() throws BlobNotFoundException {
+    @Test
+    public void testMoveBlob_withBlobNotDeleted()
+            throws BlobNotFoundException, UnsuccessfulBlobMovingException, UnsuccessfulBlobFetchingException, UnsuccessfulBlobDeletionException {
         BlobId blobId = BlobId.of("test", "test");
         when(storage.get(blobId)).thenReturn(blob);
         when(blob.copyTo("test", "test")).thenReturn(null);
@@ -133,7 +134,7 @@ public class StorageServiceTest {
     }
 
     @Test
-    public void testUploadFile() {
+    public void testUploadFile() throws UnsuccessfulBlobCreationException {
         BlobId blobId = BlobId.of("test", "test");
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType(Constants.CONTENT_TYPE)
@@ -145,6 +146,27 @@ public class StorageServiceTest {
 
         Assert.assertEquals(blob, result);
         verify(storage, times(1)).create(blobInfo, "content".getBytes());
+    }
+
+    @Test
+    public void testFetchBlob() throws UnsuccessfulBlobFetchingException, BlobNotFoundException {
+        val blobId = BlobId.of("any", "any");
+        when(storage.get(blobId)).thenReturn(blob);
+
+        val result = service.fetchBlob(blobId);
+
+        Assert.assertFalse(ObjectUtils.isEmpty(result));
+        verify(storage, times(1)).get(blobId);
+    }
+
+    @Test
+    public void testDeleteBlob() throws UnsuccessfulBlobDeletionException {
+        when(blob.delete()).thenReturn(true);
+
+        val result = service.deleteBlob(blob);
+
+        Assert.assertTrue(result);
+        verify(blob, times(1)).delete();
     }
 
 }

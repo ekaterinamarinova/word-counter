@@ -1,9 +1,6 @@
 package com.personaltask.wordcounter.route;
 
-import com.personaltask.wordcounter.exception.BlobNotFoundException;
-import com.personaltask.wordcounter.exception.InvalidBlobDestinationException;
-import com.personaltask.wordcounter.exception.NoSuchBucketException;
-import com.personaltask.wordcounter.exception.UnsuccessfulBlobDeletionException;
+import com.personaltask.wordcounter.exception.*;
 import com.personaltask.wordcounter.processor.*;
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.property.yml.GoogleCloudProperties;
@@ -42,11 +39,10 @@ public class WordCounterRoute extends RouteBuilder {
                 .handled(true)
                 .process(ExceptionLoggingProcessor.NAME);
 
-        onException(InvalidBlobDestinationException.class)
-                .handled(true)
-                .process(ExceptionLoggingProcessor.NAME);
-
-        onException(UnsuccessfulBlobDeletionException.class)
+        onException(UnsuccessfulBlobMovingException.class,
+                    UnsuccessfulBlobCreationException.class,
+                    UnsuccessfulBlobDeletionException.class,
+                    UnsuccessfulBlobFetchingException.class)
                 .handled(true)
                 .maximumRedeliveries(5)
                 .process(ExceptionLoggingProcessor.NAME);
@@ -54,8 +50,6 @@ public class WordCounterRoute extends RouteBuilder {
         onException(IOException.class)
                 .handled(true)
                 .process(ExceptionLoggingProcessor.NAME);
-
-        onCompletion().process(CleanLocalDirProcessor.NAME);
 
         from("quartz2://simpleCron?cron=" + applicationProperties.getCronExpressionWorkdaysEachMinute())
                 .process(DownloadProcessor.NAME)
@@ -65,5 +59,6 @@ public class WordCounterRoute extends RouteBuilder {
                     .process(MoveProcessor.NAME)
                 .end();
 
+        onCompletion().process(CleanLocalDirProcessor.NAME);
     }
 }
