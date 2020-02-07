@@ -4,7 +4,6 @@ import com.personaltask.wordcounter.exception.*;
 import com.personaltask.wordcounter.processor.*;
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.property.yml.GoogleCloudProperties;
-import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ public class WordCounterRoute extends RouteBuilder {
     public void configure() throws Exception {
 
         onException(NoSuchBucketException.class)
-                .log(LoggingLevel.ERROR, LOGGER, "Bucket name is null or empty.");
+                .process(ExceptionLoggingProcessor.NAME);
 
         onException(BlobNotFoundException.class)
                 .handled(true)
@@ -59,7 +58,5 @@ public class WordCounterRoute extends RouteBuilder {
                     .process(UploadProcessor.NAME)
                     .process(MoveProcessor.NAME)
                 .end();
-
-        onCompletion().process(CleanLocalDirProcessor.NAME);
     }
 }
