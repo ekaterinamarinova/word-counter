@@ -45,6 +45,7 @@ public class WordCounterRoute extends RouteBuilder {
                     UnsuccessfulBlobFetchingException.class)
                 .handled(true)
                 .maximumRedeliveries(5)
+                .delay(3000)
                 .process(ExceptionLoggingProcessor.NAME);
 
         onException(IOException.class)
