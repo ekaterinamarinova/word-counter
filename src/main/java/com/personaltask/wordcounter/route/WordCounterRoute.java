@@ -4,8 +4,6 @@ import com.personaltask.wordcounter.exception.*;
 import com.personaltask.wordcounter.processor.*;
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import org.apache.camel.builder.RouteBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
@@ -66,9 +64,7 @@ public class WordCounterRoute extends RouteBuilder {
     private void stop() throws Exception {
         getContext().getShutdownStrategy().setTimeout(1);
         getContext().stop();
-
         context.close();
-
         System.exit(1);
     }
 }
