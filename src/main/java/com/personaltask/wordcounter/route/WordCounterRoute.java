@@ -20,8 +20,6 @@ import java.io.IOException;
 @Component
 public class WordCounterRoute extends RouteBuilder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WordCounterRoute.class);
-
     private ApplicationProperties applicationProperties;
     private ConfigurableApplicationContext context;
 
@@ -65,7 +63,7 @@ public class WordCounterRoute extends RouteBuilder {
                 .end();
     }
 
-    public void stop() throws Exception {
+    private void stop() throws Exception {
         getContext().getShutdownStrategy().setTimeout(1);
         getContext().stop();
 
