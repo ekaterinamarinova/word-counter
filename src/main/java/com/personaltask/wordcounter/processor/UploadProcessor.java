@@ -40,8 +40,7 @@ public class UploadProcessor implements Processor {
         val contentFromProcessedFile = fileOperations.readFromFile(pathToProcessedFile);
         val blobName = exchange.getProperty(Constants.BLOB_NAME);
 
-        LOGGER.debug("Begin uploading blob with path " +
-                properties.getOutbound() + blobName + "and content: <" + contentFromProcessedFile + ">.");
+        LOGGER.debug("Begin uploading blob with path " + properties.getOutbound() + blobName);
 
         storageService.uploadFile(
                 properties.getBucket(),
@@ -52,6 +51,7 @@ public class UploadProcessor implements Processor {
         exchange.setProperty(Constants.BUCKET, properties.getBucket());
         exchange.setProperty(Constants.BLOB_DESTINATION, properties.getDone() + blobName);
 
-        LOGGER.debug("Uploading to bucket " + properties.getBucket() + " complete.");
+        LOGGER.debug("Uploading to bucket: " + properties.getBucket() +
+                " with destination: " + properties.getDone() +  " complete.");
     }
 }

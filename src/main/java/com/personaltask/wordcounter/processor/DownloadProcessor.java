@@ -8,6 +8,7 @@ import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -42,7 +43,11 @@ public class DownloadProcessor implements Processor {
                 googleCloudProperties.getExt(),
                 applicationProperties.getFileDestinationLocal() + applicationProperties.getDownloaded()
         );
-        LOGGER.debug("File successfully downloaded.");
+
+        if (pathList.isEmpty()) {
+            LOGGER.debug("Blob list is empty. Retrying...");
+        }
+
         exchange.getIn().setBody(pathList);
     }
 }

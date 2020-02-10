@@ -27,18 +27,18 @@ public class CleanLocalDirProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        LOGGER.debug("Deleting local temporary directory for " +
-                "file storage: " + properties.getFileDestinationLocal());
-
         val pathToDirectory = Paths.get(properties.getFileDestinationLocal());
-        val isDirectoryDeleted = fileOperations.deleteDirWithContent(pathToDirectory);
 
-        if (isDirectoryDeleted) {
-            LOGGER.debug("Directory " + pathToDirectory.toString() +
-                    " and its content successfully deleted.");
-        } else {
-            LOGGER.error("Failed to delete local directory " + pathToDirectory.toString() +
-                    " because it does not exist.");
+        LOGGER.debug("Attempting deletion of local temporary directory for " +
+                "file storage: " + pathToDirectory.toAbsolutePath().toString());
+
+        if (pathToDirectory.toFile().exists()) {
+            val isDirectoryDeleted = fileOperations.deleteDirWithContent(pathToDirectory);
+
+            if (isDirectoryDeleted) {
+                LOGGER.debug("Directory " + pathToDirectory.toAbsolutePath().toString() +
+                        " and its content successfully deleted.");
+            }
         }
 
     }
