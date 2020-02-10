@@ -1,12 +1,13 @@
 package com.personaltask.wordcounter.service;
 
-import com.personaltask.wordcounter.constant.Constants;
 import org.springframework.stereotype.Service;
 
 import java.util.TreeMap;
 
 @Service
 public class WordCountService {
+
+    private static final String WHITE_SPACE = " ";
 
     /**
      * A method that counts the words in a given message string.
@@ -21,7 +22,7 @@ public class WordCountService {
         TreeMap<String, Integer> differentWords = new TreeMap<>();
 
         String[] words = message.toLowerCase()
-                .replaceAll("[,.\\-!?\"\n\r]", Constants.WHITE_SPACE)
+                .replaceAll("[,.\\-!?\"\n\r]", WHITE_SPACE)
                 .split("\\s+");
 
         for (String word : words) {

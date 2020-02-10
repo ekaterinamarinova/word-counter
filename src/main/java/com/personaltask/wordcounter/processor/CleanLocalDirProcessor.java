@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 public class CleanLocalDirProcessor implements Processor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CleanLocalDirProcessor.class);
+    public static final String NAME = "cleanLocalDirProcessor";
 
     private FileOperations fileOperations;
     private ApplicationProperties properties;

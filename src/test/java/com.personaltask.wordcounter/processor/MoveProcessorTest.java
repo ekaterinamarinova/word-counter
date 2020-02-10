@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -33,19 +32,19 @@ public class MoveProcessorTest extends CamelTestSupport {
         super.setUp();
 
         exchange = createExchangeWithBody("mock body");
-        exchange.setProperty(Constants.BLOB_DEST_KEY, "mockValue");
-        exchange.setProperty(Constants.BLOB_NAME_KEY, "mockValue");
-        exchange.setProperty(Constants.BUCKET_KEY, "mockValue");
+        exchange.setProperty(Constants.BLOB_DESTINATION, "mockValue");
+        exchange.setProperty(Constants.BLOB_NAME, "mockValue");
+        exchange.setProperty(Constants.BUCKET, "mockValue");
     }
 
     @Test
     public void testProcess() throws Exception {
         when(properties.getInbound()).thenReturn("inbound");
-        doNothing().when(storageService).moveBlob(anyString(), anyString(), anyString());
+        doNothing().when(storageService).moveBlob(anyString(), anyString(), anyString(), anyString());
 
         moveProcessor = new MoveProcessor(storageService, properties);
         moveProcessor.process(exchange);
 
-        verify(storageService, times(1)).moveBlob(anyString(), anyString(), any());
+        verify(storageService, times(1)).moveBlob(anyString(), anyString(), anyString(), anyString());
     }
 }

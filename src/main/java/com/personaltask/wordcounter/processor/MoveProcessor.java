@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class MoveProcessor implements Processor {
 
+    public static final String NAME = "moveProcessor";
+
     private StorageService storageService;
     private GoogleCloudProperties properties;
 
@@ -26,10 +28,10 @@ public class MoveProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        val oldBlobDest = properties.getInbound() + exchange.getProperty(Constants.BLOB_NAME_KEY, String.class);
-        val newBlobDest = exchange.getProperty(Constants.BLOB_DEST_KEY, String.class);
-        val bucket = exchange.getProperty(Constants.BUCKET_KEY, String.class);
+        val bucket = exchange.getProperty(Constants.BUCKET, String.class);
+        val oldBlobDest = properties.getInbound() + exchange.getProperty(Constants.BLOB_NAME, String.class);
+        val newBlobDest = exchange.getProperty(Constants.BLOB_DESTINATION, String.class);
 
-        storageService.moveBlob(bucket, oldBlobDest, newBlobDest);
+        storageService.moveBlob(bucket, oldBlobDest, bucket, newBlobDest);
     }
 }

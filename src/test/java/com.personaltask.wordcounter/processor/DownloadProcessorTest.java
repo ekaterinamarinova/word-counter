@@ -1,6 +1,6 @@
 package com.personaltask.wordcounter.processor;
 
-import com.personaltask.wordcounter.exception.NoSuchFileException;
+import com.personaltask.wordcounter.exception.NoSuchBucketException;
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.property.yml.GoogleCloudProperties;
 import com.personaltask.wordcounter.service.StorageService;
@@ -71,14 +71,14 @@ public class DownloadProcessorTest extends CamelTestSupport {
         verify(downloadService, times(1)).downloadFiles(anyString(), anyString(), anyString(), anyString());
     }
 
-    @Test(expected = NoSuchFileException.class)
+    @Test(expected = NoSuchBucketException.class)
     public void test_withException() throws Exception {
         when(properties.getBucket()).thenReturn(null);
         when(properties.getExt()).thenReturn("");
         when(applicationProperties.getFileDestinationLocal()).thenReturn("");
         when(properties.getFileNamePrefix()).thenReturn("");
         when(downloadService.downloadFiles(eq(null), anyString(), anyString(), anyString()))
-                .thenThrow(new NoSuchFileException("random message"));
+                .thenThrow(new NoSuchBucketException("random message"));
 
         downloadProcessor = new DownloadProcessor(downloadService, properties, applicationProperties);
 
