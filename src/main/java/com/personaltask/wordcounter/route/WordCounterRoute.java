@@ -51,6 +51,7 @@ public class WordCounterRoute extends RouteBuilder {
                 .process(ExceptionLoggingProcessor.NAME);
 
         onCompletion()
+                .onFailureOnly()
                 .process(CleanLocalDirProcessor.NAME);
 
         from("quartz2://simpleCron?cron=" + applicationProperties.getCronExpressionWorkdaysEachMinute())
@@ -58,12 +59,14 @@ public class WordCounterRoute extends RouteBuilder {
                 .choice()
                     .when(simple("${body.size} == 0"))
                         .log(LoggingLevel.WARN, "Body is empty, ending route.")
+                        .stop()
                 .end()
                 .split(body())
                     .process(WordCountProcessor.NAME)
                     .process(UploadProcessor.NAME)
                     .process(MoveProcessor.NAME)
-                .end();
+                .end()
+                .process(CleanLocalDirProcessor.NAME);
     }
 
     private void stop() throws Exception {
