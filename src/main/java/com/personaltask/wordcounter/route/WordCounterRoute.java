@@ -50,10 +50,6 @@ public class WordCounterRoute extends RouteBuilder {
                 .handled(true)
                 .process(ExceptionLoggingProcessor.NAME);
 
-        onCompletion()
-                .onFailureOnly()
-                .process(CleanLocalDirProcessor.NAME);
-
         from("quartz2://simpleCron?cron=" + applicationProperties.getCronExpressionWorkdaysEachMinute())
                 .process(DownloadProcessor.NAME)
                 .choice()
