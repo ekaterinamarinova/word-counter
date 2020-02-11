@@ -41,11 +41,7 @@ public class DownloadProcessor implements Processor {
                 googleCloudProperties.getExt(),
                 applicationProperties.getFileDestinationLocal() + applicationProperties.getDownloaded()
         );
-
-        if (pathList.isEmpty()) {
-            LOGGER.debug("Blob list is empty. Retrying...");
-        }
-
         exchange.getIn().setBody(pathList);
+        LOGGER.debug("Downloaded files resulted in a collection with size: " + pathList.size());
     }
 }

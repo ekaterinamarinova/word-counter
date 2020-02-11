@@ -1,7 +1,10 @@
 package com.personaltask.wordcounter.route;
 
+import com.personaltask.wordcounter.exception.*;
+import com.personaltask.wordcounter.processor.*;
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.property.yml.CamelProperties;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -52,6 +55,10 @@ public class WordCounterRoute extends RouteBuilder {
 
         from("quartz2://simpleCron?cron=" + applicationProperties.getCronExpressionWorkdaysEachMinute())
                 .process(DownloadProcessor.NAME)
+                .choice()
+                    .when(simple("${body.size} == 0"))
+                        .log(LoggingLevel.WARN, "Body is empty, ending route.")
+                .end()
                 .split(body())
                     .process(WordCountProcessor.NAME)
                     .process(UploadProcessor.NAME)

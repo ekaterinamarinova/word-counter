@@ -2,6 +2,7 @@ package com.personaltask.wordcounter.processor;
 
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.service.FileOperations;
+import lombok.var;
 import org.apache.camel.Exchange;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Before;
@@ -9,6 +10,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -32,12 +36,18 @@ public class CleanLocalDirProcessorTest extends CamelTestSupport {
 
     @Test
     public void testProcess() throws Exception {
-        when(properties.getFileDestinationLocal()).thenReturn("");
+        var dir = Files.createDirectory(Paths.get("test"));
+        var file = Files.createFile(Paths.get(dir + "/NewTestFile.txt"));
+
+        when(properties.getFileDestinationLocal()).thenReturn(file.toString());
         when(fileOperations.deleteDirWithContent(any())).thenReturn(true);
 
         CleanLocalDirProcessor cleanLocalDirProcessor = new CleanLocalDirProcessor(fileOperations, properties);
         cleanLocalDirProcessor.process(exchange);
 
         verify(fileOperations, times(1)).deleteDirWithContent(any());
+
+        Files.deleteIfExists(file);
+        Files.deleteIfExists(dir);
     }
 }
