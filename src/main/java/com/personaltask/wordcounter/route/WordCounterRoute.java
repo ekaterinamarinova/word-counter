@@ -1,7 +1,5 @@
 package com.personaltask.wordcounter.route;
 
-import com.personaltask.wordcounter.exception.*;
-import com.personaltask.wordcounter.processor.*;
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.property.yml.CamelProperties;
 import org.apache.camel.builder.RouteBuilder;
