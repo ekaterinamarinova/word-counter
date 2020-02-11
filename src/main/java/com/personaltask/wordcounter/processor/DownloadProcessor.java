@@ -8,11 +8,9 @@ import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
 import java.nio.file.Path;
 import java.util.List;
-
 
 /**
  * Processor used for downloading files from Google Cloud.
