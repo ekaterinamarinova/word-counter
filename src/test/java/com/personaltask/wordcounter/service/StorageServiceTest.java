@@ -7,7 +7,6 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.personaltask.wordcounter.constant.Constants;
 import com.personaltask.wordcounter.exception.*;
-import lombok.val;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -150,10 +149,10 @@ public class StorageServiceTest {
 
     @Test
     public void testFetchBlob() throws UnsuccessfulBlobFetchingException, BlobNotFoundException {
-        val blobId = BlobId.of("any", "any");
+        var blobId = BlobId.of("any", "any");
         when(storage.get(blobId)).thenReturn(blob);
 
-        val result = service.fetchBlob(blobId);
+        var result = service.fetchBlob(blobId);
 
         Assert.assertFalse(ObjectUtils.isEmpty(result));
         verify(storage, times(1)).get(blobId);
@@ -163,7 +162,7 @@ public class StorageServiceTest {
     public void testDeleteBlob() throws UnsuccessfulBlobDeletionException {
         when(blob.delete()).thenReturn(true);
 
-        val result = service.deleteBlob(blob);
+        var result = service.deleteBlob(blob);
 
         Assert.assertTrue(result);
         verify(blob, times(1)).delete();

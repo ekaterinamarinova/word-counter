@@ -4,7 +4,6 @@ import com.personaltask.wordcounter.constant.Constants;
 import com.personaltask.wordcounter.property.yml.GoogleCloudProperties;
 import com.personaltask.wordcounter.service.FileOperations;
 import com.personaltask.wordcounter.service.StorageService;
-import lombok.val;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
@@ -36,9 +35,9 @@ public class UploadProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        val pathToProcessedFile = exchange.getIn().getBody(Path.class);
-        val contentFromProcessedFile = fileOperations.readFromFile(pathToProcessedFile);
-        val blobName = exchange.getProperty(Constants.BLOB_NAME);
+        var pathToProcessedFile = exchange.getIn().getBody(Path.class);
+        var contentFromProcessedFile = fileOperations.readFromFile(pathToProcessedFile);
+        var blobName = exchange.getProperty(Constants.BLOB_NAME);
 
         LOGGER.debug("Begin uploading blob with path " + properties.getOutbound() + blobName);
 

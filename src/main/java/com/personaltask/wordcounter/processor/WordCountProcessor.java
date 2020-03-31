@@ -4,7 +4,6 @@ import com.personaltask.wordcounter.constant.Constants;
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.service.FileOperations;
 import com.personaltask.wordcounter.service.WordCountService;
-import lombok.val;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
@@ -40,18 +39,18 @@ public class WordCountProcessor implements Processor {
     public void process(Exchange exchange) throws IOException {
         LOGGER.debug("Beginning of processing file with path: " + exchange.getIn().getBody());
 
-        val pathToFileForProcessing = exchange.getIn().getBody(Path.class);
-        val downloadedBlobName = pathToFileForProcessing.getFileName().toString();
-        val content = fileOperations.readFromFile(pathToFileForProcessing);
+        var pathToFileForProcessing = exchange.getIn().getBody(Path.class);
+        var downloadedBlobName = pathToFileForProcessing.getFileName().toString();
+        var content = fileOperations.readFromFile(pathToFileForProcessing);
 
         Map<String, Integer> result = service.countWords(content);
 
-        val pathToEmptyFile = fileOperations.createFile(
+        var pathToEmptyFile = fileOperations.createFile(
                 Paths.get(properties.getFileDestinationLocal() + properties.getCounted()),
                 properties.getGeneratedFileNamePrefix() + downloadedBlobName
         );
 
-        val pathToFileWithContent = fileOperations.writeToFile(pathToEmptyFile, result.toString());
+        var pathToFileWithContent = fileOperations.writeToFile(pathToEmptyFile, result.toString());
 
         exchange.getIn().setBody(pathToFileWithContent);
         exchange.setProperty(Constants.BLOB_NAME, downloadedBlobName);

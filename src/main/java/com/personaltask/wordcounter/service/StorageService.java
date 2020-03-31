@@ -4,7 +4,6 @@ import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.*;
 import com.personaltask.wordcounter.constant.Constants;
 import com.personaltask.wordcounter.exception.*;
-import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -64,13 +63,13 @@ public class StorageService {
             if (blob.getSize() > 0 && blob.getName().endsWith(ext)) {
                 int indexOfSlash = blob.getName().lastIndexOf(SLASH);
 
-                val blobNameExtension = blob.getName().substring(indexOfSlash);
-                val directoryPath = Paths.get(destination).toAbsolutePath();
-                val pathToEmptyFile = fileOperations.createFile(
+                var blobNameExtension = blob.getName().substring(indexOfSlash);
+                var directoryPath = Paths.get(destination).toAbsolutePath();
+                var pathToEmptyFile = fileOperations.createFile(
                         directoryPath,
                         blobNameExtension
                 );
-                val pathToBlob = fileOperations.writeToFile(pathToEmptyFile, new String(blob.getContent()));
+                var pathToBlob = fileOperations.writeToFile(pathToEmptyFile, new String(blob.getContent()));
 
                 //if no exception occurs, add current blob path to the list to be used on downstream processing
                 blobPathList.add(pathToBlob);
@@ -100,7 +99,7 @@ public class StorageService {
         BlobId blobId = BlobId.of(oldBucket, oldBlobDest);
 
         try {
-            val blob = fetchBlob(blobId);
+            var blob = fetchBlob(blobId);
             blob.copyTo(newBucket, newBlobDest);
             boolean deleted = deleteBlob(blob);
 
@@ -122,7 +121,7 @@ public class StorageService {
      */
     protected Blob fetchBlob(BlobId blobId) throws BlobNotFoundException, UnsuccessfulBlobFetchingException {
         try {
-            val blob = storage.get(blobId);
+            var blob = storage.get(blobId);
 
             if (blob == null) {
                 throw new BlobNotFoundException("Blob with name: " + blobId.getName() + " could not be found.");
@@ -167,7 +166,7 @@ public class StorageService {
                 .build();
 
         try {
-            val uploadedBlob = storage.create(blobInfo, content);
+            var uploadedBlob = storage.create(blobInfo, content);
             LOGGER.debug("Blob " + blobFullName + " uploaded to bucket " + bucket);
             return uploadedBlob;
         } catch (StorageException e) {

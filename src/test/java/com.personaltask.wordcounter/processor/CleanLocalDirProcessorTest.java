@@ -2,7 +2,6 @@ package com.personaltask.wordcounter.processor;
 
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.service.FileOperations;
-import lombok.var;
 import org.apache.camel.Exchange;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Before;

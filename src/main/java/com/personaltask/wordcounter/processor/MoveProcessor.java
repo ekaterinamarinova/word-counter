@@ -3,7 +3,6 @@ package com.personaltask.wordcounter.processor;
 import com.personaltask.wordcounter.constant.Constants;
 import com.personaltask.wordcounter.property.yml.GoogleCloudProperties;
 import com.personaltask.wordcounter.service.StorageService;
-import lombok.val;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
@@ -32,9 +31,9 @@ public class MoveProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        val bucket = exchange.getProperty(Constants.BUCKET, String.class);
-        val oldBlobDest = properties.getInbound() + exchange.getProperty(Constants.BLOB_NAME, String.class);
-        val newBlobDest = exchange.getProperty(Constants.BLOB_DESTINATION, String.class);
+        var bucket = exchange.getProperty(Constants.BUCKET, String.class);
+        var oldBlobDest = properties.getInbound() + exchange.getProperty(Constants.BLOB_NAME, String.class);
+        var newBlobDest = exchange.getProperty(Constants.BLOB_DESTINATION, String.class);
 
         LOGGER.debug("Initiating moving of blob from: " + oldBlobDest + " to: " + newBlobDest);
         storageService.moveBlob(bucket, oldBlobDest, bucket, newBlobDest);

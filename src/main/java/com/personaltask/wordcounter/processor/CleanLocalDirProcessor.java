@@ -2,7 +2,6 @@ package com.personaltask.wordcounter.processor;
 
 import com.personaltask.wordcounter.property.yml.ApplicationProperties;
 import com.personaltask.wordcounter.service.FileOperations;
-import lombok.val;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
@@ -27,13 +26,13 @@ public class CleanLocalDirProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        val pathToDirectory = Paths.get(properties.getFileDestinationLocal());
+        var pathToDirectory = Paths.get(properties.getFileDestinationLocal());
 
         LOGGER.debug("Attempting deletion of local temporary directory for " +
                 "file storage: " + pathToDirectory.toAbsolutePath().toString());
 
         if (pathToDirectory.toFile().exists()) {
-            val isDirectoryDeleted = fileOperations.deleteDirWithContent(pathToDirectory);
+            var isDirectoryDeleted = fileOperations.deleteDirWithContent(pathToDirectory);
 
             if (isDirectoryDeleted) {
                 LOGGER.debug("Directory " + pathToDirectory.toAbsolutePath().toString() +
