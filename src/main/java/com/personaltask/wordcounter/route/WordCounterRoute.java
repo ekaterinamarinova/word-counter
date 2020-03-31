@@ -31,10 +31,10 @@ public class WordCounterRoute extends RouteBuilder {
         this.context = context;
     }
 
-    public void configure() throws Exception {
+    public void configure() {
         onException(NoSuchBucketException.class)
                 .process(ExceptionLoggingProcessor.NAME)
-                .process(exchange -> stop());
+                .process(exchange -> stopApplication());
 
         onException(UnsuccessfulBlobCreationException.class,
                     UnsuccessfulBlobMovingException.class,
@@ -65,7 +65,7 @@ public class WordCounterRoute extends RouteBuilder {
                 .process(CleanLocalDirProcessor.NAME);
     }
 
-    private void stop() throws Exception {
+    private void stopApplication() throws Exception {
         getContext().getShutdownStrategy().setTimeout(1);
         getContext().stop();
         context.close();

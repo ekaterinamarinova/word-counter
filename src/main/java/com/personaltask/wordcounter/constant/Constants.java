@@ -7,8 +7,6 @@ public final class Constants {
     public static final String BLOB_NAME = "blobName";
     public static final String BLOB_DESTINATION = "blobDestination";
 
-    private Constants() {
-
-    }
+    private Constants() { }
 
 }
