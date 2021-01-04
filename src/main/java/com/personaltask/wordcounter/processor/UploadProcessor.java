@@ -23,9 +23,9 @@ public class UploadProcessor implements Processor {
     private static final Logger LOGGER = LoggerFactory.getLogger(UploadProcessor.class);
     public static final String NAME = "uploadProcessor";
 
-    private StorageService storageService;
-    private GoogleCloudProperties properties;
-    private FileOperations fileOperations;
+    private final StorageService storageService;
+    private final GoogleCloudProperties properties;
+    private final FileOperations fileOperations;
 
     public UploadProcessor(StorageService storageService, GoogleCloudProperties properties, FileOperations fileOperations) {
         this.storageService = storageService;

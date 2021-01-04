@@ -25,9 +25,9 @@ public class WordCountProcessor implements Processor {
     private static final Logger LOGGER = LoggerFactory.getLogger(WordCountProcessor.class);
     public static final String NAME = "wordCountProcessor";
 
-    private WordCountService service;
-    private ApplicationProperties properties;
-    private FileOperations fileOperations;
+    private final WordCountService service;
+    private final ApplicationProperties properties;
+    private final FileOperations fileOperations;
 
     public WordCountProcessor(WordCountService service, ApplicationProperties properties, FileOperations fileOperations) {
         this.service = service;

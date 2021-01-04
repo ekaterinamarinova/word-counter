@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CamelConfiguration {
-
     @Bean
     public QuartzComponent quartzComponent(CamelContext camelContext) {
         QuartzComponent quartz2 = camelContext.getComponent("quartz2", QuartzComponent.class);

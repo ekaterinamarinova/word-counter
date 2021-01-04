@@ -21,8 +21,8 @@ public class MoveProcessor implements Processor {
 
     public static final String NAME = "moveProcessor";
 
-    private StorageService storageService;
-    private GoogleCloudProperties properties;
+    private final StorageService storageService;
+    private final GoogleCloudProperties properties;
 
     public MoveProcessor(StorageService storageService, GoogleCloudProperties properties) {
         this.storageService = storageService;

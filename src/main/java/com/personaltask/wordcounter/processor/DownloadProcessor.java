@@ -23,9 +23,9 @@ public class DownloadProcessor implements Processor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadProcessor.class);
     public static final String NAME = "downloadProcessor";
 
-    private StorageService storageService;
-    private GoogleCloudProperties googleCloudProperties;
-    private ApplicationProperties applicationProperties;
+    private final StorageService storageService;
+    private final GoogleCloudProperties googleCloudProperties;
+    private final ApplicationProperties applicationProperties;
 
     public DownloadProcessor(StorageService storageService, GoogleCloudProperties googleCloudProperties, ApplicationProperties applicationProperties) {
         this.storageService = storageService;

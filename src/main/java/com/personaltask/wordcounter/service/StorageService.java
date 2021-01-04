@@ -21,8 +21,8 @@ public class StorageService {
     private static final Logger LOGGER = LoggerFactory.getLogger(StorageService.class);
     private static final String SLASH = "/";
 
-    private Storage storage;
-    private FileOperations fileOperations;
+    private final Storage storage;
+    private final FileOperations fileOperations;
 
     public StorageService(Storage storage, FileOperations fileOperations) {
         this.storage = storage;

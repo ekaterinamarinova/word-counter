@@ -16,8 +16,8 @@ public class CleanLocalDirProcessor implements Processor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CleanLocalDirProcessor.class);
     public static final String NAME = "cleanLocalDirProcessor";
 
-    private FileOperations fileOperations;
-    private ApplicationProperties properties;
+    private final FileOperations fileOperations;
+    private final ApplicationProperties properties;
 
     public CleanLocalDirProcessor(FileOperations fileOperations, ApplicationProperties properties) {
         this.fileOperations = fileOperations;

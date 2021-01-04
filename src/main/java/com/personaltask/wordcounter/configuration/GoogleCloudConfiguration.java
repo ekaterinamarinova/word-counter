@@ -7,10 +7,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class GoogleCloudConfiguration {
-
     @Bean
     public Storage getStorageInstance() {
         return StorageOptions.getDefaultInstance().getService();
     }
-
 }
